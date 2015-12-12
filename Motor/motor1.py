@@ -2,8 +2,8 @@ from time import sleep
 import RPi.GPIO as GPIO
 import sys
 import picamera
-
-def move(p_umdrehung, p_r,_p_l,p_direction):
+#Moves motors
+def move(p_umdrehung, p_r,p_l,p_direction):
 	try:
 		GPIO.setmode(GPIO.BCM)
 
@@ -98,27 +98,77 @@ def move(p_umdrehung, p_r,_p_l,p_direction):
 	finally:
 		GPIO.cleanup()
 
+#Program to Capture a sequence of images		
+def program1(p_seq):
+	try:
+		camera.resolution = (640,480)
+		camera.preview_fullscreen = False
+		camera.preview_window = (500,330,500,400)
+		camera.start_preview()	
+		sleep(2)
+	
+		for i in range (p_seq):
+			#correct smaller wheel
+			move(10,0,1,1)
+			#Move one pic
+			move(25,1,1,1)
+			#correct smaller wheel
+			move(2,0,1,1)
+			#capture image
+			#camera.capture('image.jpg')
+			sleep(2)
+			
+		#Wait before turning of the camera	
+		#sleep(2)
+		camera.stop_preview()
+		return
+
+#program that turns both wheels in given direction
+def program2(p_seq,p_dir):
+	for i in range (p_seq):
+		#correct smaller wheel
+		move(20,1,1,p_dir)
+	return
+	
+#program that turns left wheel in given direction
+def program3(p_seq,p_dir):
+	for i in range (p_seq):
+		move(20,1,0,p_dir)
+	return
+	
+#program that turns right wheel in given direction
+def program4(p_seq,p_dir):
+	for i in range (p_seq):
+		move(20,0,1,p_dir)
+	return
+	
 camera = picamera.PiCamera()
-try:
-	camera.resolution = (640,480)
-	camera.preview_fullscreen = False
-	camera.preview_window = (500,330,500,400)
-	camera.start_preview()	
-	sleep(2)
 	
-	#Move one pic
-	move(120,1,1,1,)
-	#correct smaller wheel
-	move(20,1,0,1)
-	#capture image
-	#camera.capture('image.jpg')
-	sleep(2)
+try:	
+	p = 0
+	if len(sys.argv)>1:
+		p = int(sys.argv[1])
 	
+	s = 1
+	if len(sys.argv)>2:
+		s = int(sys.argv[2])
+		
+	d = 1
+	if len(sys.argv)>3:
+		d = int(sys.argv[3])	
 	
-	#Wait before turning of the camera	
-	sleep(5)
-	camera.stop_preview()
+	if p = 1:
+		program1(s)
+	elif p=2:
+		program2(s,d)
+	elif p=3:
+		program3(s,d)
+	elif p=4:
+		program3(s,d)
+	else:
+		print "No programm selected. Try  sudo python moto1.py 1"
+
 	pass
 finally:
 	camera.close()
-	GPIO.cleanup()
+	#GPIO.cleanup()
